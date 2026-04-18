@@ -3,11 +3,10 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user
-from app.db.database import get_db
-from app.models.models import Task, User
-from app.schemas.schemas import PaginatedTasks, TaskCreate, TaskOut, TaskUpdate
-
+from dependencies import get_current_user
+from database import get_db
+from models import Task, User
+from schemas import PaginatedTasks, TaskCreate, TaskOut, TaskUpdate
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 

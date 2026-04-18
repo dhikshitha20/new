@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.security import create_access_token, hash_password, verify_password
-from app.db.database import get_db
-from app.models.models import User
-from app.schemas.schemas import LoginRequest, Token, UserCreate, UserOut
+from security import create_access_token, hash_password, verify_password
+from database import get_db
+from models import User
+from schemas import LoginRequest, Token, UserCreate, UserOut
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 

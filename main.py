@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import Base, engine
-from app.models import models  # noqa: F401 – ensures models are registered
-from app.routers import auth, tasks
-
+import models
+import auth
+import tasks
 # Create all tables
 Base.metadata.create_all(bind=engine)
 

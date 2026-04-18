@@ -3,9 +3,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.db.database import Base, get_db
-from app.main import app
-
+from database import Base, get_db
+from main import app
 # Use an in-memory SQLite DB for tests
 TEST_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
