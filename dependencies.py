@@ -21,7 +21,6 @@ def get_current_user(
     db: Session = Depends(get_db),
 ):
     from models import User
-
     token = credentials.credentials
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])

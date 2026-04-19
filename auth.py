@@ -1,12 +1,21 @@
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
 from models import User
 from schemas import UserCreate, UserOut, LoginRequest, Token
 from security import hash_password, verify_password
-from dependencies import create_access_token
+from jose import jwt
+from config import settings
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
+
+
+def create_access_token(data: dict) -> str:
+    payload = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.access_token_expire_minutes)
+    payload.update({"exp": expire})
+    return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
 
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
