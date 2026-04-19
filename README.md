@@ -23,24 +23,30 @@ A full-stack Task Manager with a FastAPI backend and vanilla HTML/JS/CSS fronten
 ---
 
 ## Project Structure
-├── main.py           # FastAPI app entry point + frontend serving
-├── auth.py           # Register & login routes
-├── tasks.py          # Task CRUD routes
-├── models.py         # SQLAlchemy ORM models
-├── schemas.py        # Pydantic schemas
-├── database.py       # DB session setup
-├── config.py         # Settings via pydantic-settings
-├── security.py       # Password hashing
-├── dependencies.py   # JWT creation & auth dependency
-├── test_api.py       # pytest test suite
-├── index.html        # Frontend single-page app
+project/
+│
+├── app/
+│   ├── main.py
+│   ├── auth.py
+│   ├── tasks.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── database.py
+│   ├── config.py
+│   ├── security.py
+│   └── dependencies.py
+│
+├── tests/
+│   └── test_api.py
+│
+├── frontend/
+│   └── index.html
+│
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
 ├── .env.example
 └── README.md
-
----
 
 ## Environment Variables
 
