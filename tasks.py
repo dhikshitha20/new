@@ -1,12 +1,11 @@
 from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-
 from dependencies import get_current_user
 from database import get_db
 from models import Task, User
 from schemas import PaginatedTasks, TaskCreate, TaskOut, TaskUpdate
+
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 
@@ -41,7 +40,6 @@ def list_tasks(
     query = db.query(Task).filter(Task.owner_id == current_user.id)
     if completed is not None:
         query = query.filter(Task.completed == completed)
-
     total = query.count()
     tasks = query.offset((page - 1) * page_size).limit(page_size).all()
     return {"total": total, "page": page, "page_size": page_size, "tasks": tasks}

@@ -1,879 +1,217 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TaskFlow</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+<title>TaskFlow</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #8fa3c7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-    :root {
-      --bg: #0c0c0f;
-      --surface: #141418;
-      --border: #222228;
-      --accent: #c8ff57;
-      --accent-dim: rgba(200,255,87,0.12);
-      --text: #e8e8f0;
-      --muted: #5a5a6e;
-      --danger: #ff5757;
-      --danger-dim: rgba(255,87,87,0.12);
-      --done: #57b8ff;
-      --done-dim: rgba(87,184,255,0.10);
-      --radius: 10px;
-      --font-head: 'Syne', sans-serif;
-      --font-mono: 'DM Mono', monospace;
-    }
+/* LOGIN CARD */
+.card {
+background: transparent;
+width: 320px;
+text-align: center;
+color: white;
+}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+input {
+width: 100%;
+padding: 12px;
+margin: 8px 0;
+border: none;
+border-radius: 4px;
+}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-mono);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+button {
+width: 100%;
+padding: 12px;
+margin-top: 10px;
+background: #5c7fb8;
+border: none;
+color: white;
+cursor: pointer;
+border-radius: 4px;
+}
 
-    /* ── Header ── */
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 32px;
-      border-bottom: 1px solid var(--border);
-    }
+.link {
+margin-top: 10px;
+font-size: 14px;
+cursor: pointer;
+text-decoration: underline;
+}
 
-    .logo {
-      font-family: var(--font-head);
-      font-weight: 800;
-      font-size: 1.35rem;
-      letter-spacing: -0.5px;
-      color: var(--accent);
-    }
+.hidden {
+display: none;
+}
 
-    .logo span { color: var(--text); }
+/* TASK PAGE */
+.taskBox {
+background: #161b22;
+padding: 20px;
+border-radius: 10px;
+width: 320px;
+color: white;
+}
 
-    #header-user {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.78rem;
-      color: var(--muted);
-    }
+ul {
+padding: 0;
+list-style: none;
+}
 
-    #username-display {
-      color: var(--accent);
-      font-weight: 500;
-    }
+li {
+background: #0d1117;
+margin: 5px;
+padding: 8px;
+border-radius: 5px;
+display: flex;
+justify-content: space-between;
+} </style>
 
-    /* ── Buttons ── */
-    button {
-      cursor: pointer;
-      border: none;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      border-radius: var(--radius);
-      transition: all 0.15s;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #0c0c0f;
-      font-weight: 500;
-      padding: 10px 20px;
-    }
-    .btn-primary:hover { background: #d4ff70; transform: translateY(-1px); }
-    .btn-primary:active { transform: translateY(0); }
-
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 9px 16px;
-    }
-    .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
-
-    .btn-danger {
-      background: var(--danger-dim);
-      color: var(--danger);
-      padding: 6px 12px;
-      font-size: 0.75rem;
-    }
-    .btn-danger:hover { background: rgba(255,87,87,0.22); }
-
-    .btn-done {
-      background: var(--done-dim);
-      color: var(--done);
-      padding: 6px 12px;
-      font-size: 0.75rem;
-    }
-    .btn-done:hover { background: rgba(87,184,255,0.2); }
-
-    .btn-sm {
-      padding: 7px 14px;
-      font-size: 0.75rem;
-    }
-
-    .btn-logout {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      padding: 6px 14px;
-      font-size: 0.75rem;
-    }
-    .btn-logout:hover { color: var(--danger); border-color: var(--danger); }
-
-    /* ── Auth Screen ── */
-    #auth-screen {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 16px;
-    }
-
-    .auth-card {
-      width: 100%;
-      max-width: 400px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 40px;
-    }
-
-    .auth-card h1 {
-      font-family: var(--font-head);
-      font-size: 1.7rem;
-      font-weight: 800;
-      margin-bottom: 6px;
-    }
-
-    .auth-card p.subtitle {
-      color: var(--muted);
-      font-size: 0.8rem;
-      margin-bottom: 28px;
-    }
-
-    .tab-row {
-      display: flex;
-      gap: 4px;
-      background: var(--bg);
-      border-radius: 8px;
-      padding: 4px;
-      margin-bottom: 24px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 8px;
-      border-radius: 6px;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      background: transparent;
-      color: var(--muted);
-      border: none;
-      transition: all 0.15s;
-    }
-    .tab-btn.active {
-      background: var(--surface);
-      color: var(--accent);
-      border: 1px solid var(--border);
-    }
-
-    /* ── Forms ── */
-    .form-group { margin-bottom: 16px; }
-
-    label {
-      display: block;
-      font-size: 0.72rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 6px;
-    }
-
-    input, textarea {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      padding: 10px 14px;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-    input:focus, textarea:focus { border-color: var(--accent); }
-    textarea { resize: vertical; min-height: 72px; }
-
-    .form-row { display: flex; gap: 8px; }
-    .form-row .form-group { flex: 1; margin-bottom: 0; }
-
-    .error-msg {
-      color: var(--danger);
-      font-size: 0.75rem;
-      margin-top: 12px;
-      padding: 8px 12px;
-      background: var(--danger-dim);
-      border-radius: 6px;
-      display: none;
-    }
-    .error-msg.show { display: block; }
-
-    .success-msg {
-      color: var(--accent);
-      font-size: 0.75rem;
-      margin-top: 12px;
-      padding: 8px 12px;
-      background: var(--accent-dim);
-      border-radius: 6px;
-      display: none;
-    }
-    .success-msg.show { display: block; }
-
-    /* ── App Screen ── */
-    #app-screen { display: none; flex: 1; flex-direction: column; }
-    #app-screen.visible { display: flex; }
-
-    .app-body {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 0;
-    }
-
-    /* ── Sidebar ── */
-    .sidebar {
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .sidebar-label {
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      padding: 0 8px;
-      margin-bottom: 4px;
-    }
-
-    .filter-btn {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid transparent;
-      text-align: left;
-      transition: all 0.15s;
-    }
-    .filter-btn:hover { color: var(--text); border-color: var(--border); }
-    .filter-btn.active {
-      background: var(--accent-dim);
-      color: var(--accent);
-      border-color: rgba(200,255,87,0.25);
-    }
-
-    .filter-btn .count {
-      font-size: 0.7rem;
-      background: var(--border);
-      padding: 2px 7px;
-      border-radius: 20px;
-      color: var(--muted);
-    }
-    .filter-btn.active .count { background: rgba(200,255,87,0.2); color: var(--accent); }
-
-    .sidebar-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 8px 0;
-    }
-
-    /* ── Main Panel ── */
-    .main-panel { padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-
-    .panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .panel-title {
-      font-family: var(--font-head);
-      font-size: 1.3rem;
-      font-weight: 700;
-    }
-
-    /* ── Add Task Form ── */
-    .add-task-form {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .add-task-form h3 {
-      font-family: var(--font-head);
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--muted);
-    }
-
-    .add-task-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-
-    /* ── Task List ── */
-    .tasks-list { display: flex; flex-direction: column; gap: 10px; }
-
-    .task-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px 18px;
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      transition: border-color 0.15s;
-      animation: slideIn 0.2s ease;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .task-card:hover { border-color: #333340; }
-    .task-card.completed { opacity: 0.55; }
-
-    .task-check {
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--border);
-      border-radius: 50%;
-      flex-shrink: 0;
-      margin-top: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .task-check:hover { border-color: var(--accent); }
-    .task-card.completed .task-check {
-      background: var(--done-dim);
-      border-color: var(--done);
-    }
-    .task-card.completed .task-check::after {
-      content: '✓';
-      font-size: 10px;
-      color: var(--done);
-    }
-
-    .task-body { flex: 1; min-width: 0; }
-
-    .task-title {
-      font-size: 0.88rem;
-      font-weight: 500;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-    .task-card.completed .task-title {
-      text-decoration: line-through;
-      color: var(--muted);
-    }
-
-    .task-desc {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 8px;
-      white-space: pre-wrap;
-    }
-
-    .task-meta {
-      font-size: 0.7rem;
-      color: #3a3a4e;
-    }
-
-    .task-actions {
-      display: flex;
-      gap: 6px;
-      flex-shrink: 0;
-      align-items: flex-start;
-    }
-
-    /* ── Empty State ── */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-    }
-
-    .empty-state .icon {
-      font-size: 2.5rem;
-      margin-bottom: 12px;
-      opacity: 0.4;
-    }
-
-    .empty-state p {
-      font-size: 0.82rem;
-    }
-
-    /* ── Toast ── */
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 0.8rem;
-      transform: translateY(80px);
-      opacity: 0;
-      transition: all 0.25s ease;
-      z-index: 999;
-      max-width: 320px;
-    }
-    #toast.show { transform: translateY(0); opacity: 1; }
-    #toast.success { border-color: rgba(200,255,87,0.3); color: var(--accent); }
-    #toast.error   { border-color: rgba(255,87,87,0.3); color: var(--danger); }
-
-    /* ── Loader ── */
-    .loader {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Pagination ── */
-    .pagination {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: center;
-    }
-
-    .page-info { font-size: 0.75rem; color: var(--muted); }
-
-    /* ── Responsive ── */
-    @media (max-width: 680px) {
-      .app-body { grid-template-columns: 1fr; }
-      .sidebar { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; padding: 12px; gap: 6px; }
-      .sidebar-label, .sidebar-divider { display: none; }
-      .filter-btn { flex: none; }
-      header { padding: 14px 16px; }
-      .main-panel { padding: 18px 16px; }
-    }
-  </style>
 </head>
+
 <body>
 
-<!-- ── Auth Screen ─────────────────────────────────────── -->
-<header>
-  <div class="logo">Task<span>Flow</span></div>
-  <div id="header-user" style="display:none">
-    <span>logged in as <strong id="username-display"></strong></span>
-    <button class="btn-logout" onclick="logout()">logout</button>
-  </div>
-</header>
+<!-- LOGIN PAGE -->
 
-<div id="auth-screen">
-  <div class="auth-card">
-    <h1>Welcome back.</h1>
-    <p class="subtitle">Sign in or create an account to manage your tasks.</p>
+<div class="card" id="loginPage">
+  <h2>Sign in</h2>
 
-    <div class="tab-row">
-      <button class="tab-btn active" onclick="switchTab('login')">Login</button>
-      <button class="tab-btn" onclick="switchTab('register')">Register</button>
-    </div>
+  <input id="luser" placeholder="Username">
+  <input id="lpass" placeholder="Password" type="password">
 
-    <!-- Login Form -->
-    <div id="login-form">
-      <div class="form-group">
-        <label>Username</label>
-        <input id="login-username" type="text" placeholder="your_username" autocomplete="username" />
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" />
-      </div>
-      <div class="error-msg" id="login-error"></div>
-      <br/>
-      <button class="btn-primary" style="width:100%" onclick="handleLogin()">Sign in →</button>
-    </div>
+<button onclick="login()">Login</button>
 
-    <!-- Register Form -->
-    <div id="register-form" style="display:none">
-      <div class="form-group">
-        <label>Username</label>
-        <input id="reg-username" type="text" placeholder="choose_a_username" autocomplete="username" />
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input id="reg-email" type="email" placeholder="you@example.com" autocomplete="email" />
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input id="reg-password" type="password" placeholder="min 6 characters" autocomplete="new-password" />
-      </div>
-      <div class="error-msg" id="reg-error"></div>
-      <div class="success-msg" id="reg-success"></div>
-      <br/>
-      <button class="btn-primary" style="width:100%" onclick="handleRegister()">Create account →</button>
-    </div>
-  </div>
+  <div class="link" onclick="showRegister()">Create account</div>
 </div>
 
-<!-- ── App Screen ─────────────────────────────────────── -->
-<div id="app-screen">
-  <div class="app-body">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-label">Filter</div>
-      <button class="filter-btn active" onclick="setFilter('all')" id="filter-all">
-        All tasks <span class="count" id="count-all">0</span>
-      </button>
-      <button class="filter-btn" onclick="setFilter('pending')" id="filter-pending">
-        Pending <span class="count" id="count-pending">0</span>
-      </button>
-      <button class="filter-btn" onclick="setFilter('completed')" id="filter-completed">
-        Completed <span class="count" id="count-completed">0</span>
-      </button>
-    </aside>
+<!-- REGISTER PAGE -->
 
-    <!-- Main -->
-    <main class="main-panel">
-      <div class="panel-header">
-        <div class="panel-title" id="panel-title">All tasks</div>
-        <button class="btn-primary btn-sm" onclick="toggleAddForm()">+ New task</button>
-      </div>
+<div class="card hidden" id="registerPage">
+  <h2>Register</h2>
 
-      <!-- Add Task Form -->
-      <div class="add-task-form" id="add-task-form" style="display:none">
-        <h3>// new task</h3>
-        <div class="form-group">
-          <label>Title</label>
-          <input id="new-title" type="text" placeholder="What needs to be done?" />
-        </div>
-        <div class="form-group">
-          <label>Description (optional)</label>
-          <textarea id="new-desc" placeholder="Add details..."></textarea>
-        </div>
-        <div class="add-task-actions">
-          <button class="btn-ghost" onclick="toggleAddForm()">Cancel</button>
-          <button class="btn-primary" onclick="createTask()">Add task</button>
-        </div>
-      </div>
+  <input id="ruser" placeholder="Username">
+  <input id="remail" placeholder="Email">
+  <input id="rpass" placeholder="Password" type="password">
 
-      <!-- Task List -->
-      <div class="tasks-list" id="tasks-list"></div>
+<button onclick="register()">Register</button>
 
-      <!-- Pagination -->
-      <div class="pagination" id="pagination" style="display:none">
-        <button class="btn-ghost btn-sm" onclick="changePage(-1)" id="btn-prev">← prev</button>
-        <span class="page-info" id="page-info"></span>
-        <button class="btn-ghost btn-sm" onclick="changePage(1)" id="btn-next">next →</button>
-      </div>
-    </main>
-  </div>
+  <div class="link" onclick="showLogin()">Back to login</div>
 </div>
 
-<!-- Toast -->
-<div id="toast"></div>
+<!-- TASK PAGE -->
+
+<div class="taskBox hidden" id="taskPage">
+  <h2>Your Tasks</h2>
+
+  <input id="task" placeholder="New task">
+  <button onclick="addTask()">Add</button>
+
+  <ul id="list"></ul>
+</div>
 
 <script>
-  // ── Config ───────────────────────────────────────────────────────────────
-  const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:8000'
-    : '';  // same origin if serving frontend from FastAPI
+const API = "https://new-1-zgyr.onrender.com";
+let token = "";
 
-  // ── State ────────────────────────────────────────────────────────────────
-  let token = localStorage.getItem('tm_token') || null;
-  let currentUser = localStorage.getItem('tm_user') || null;
-  let currentFilter = 'all';
-  let currentPage = 1;
-  const PAGE_SIZE = 10;
+// SWITCH UI
+function showRegister() {
+  loginPage.classList.add("hidden");
+  registerPage.classList.remove("hidden");
+}
 
-  // ── Init ─────────────────────────────────────────────────────────────────
-  if (token) showApp();
+function showLogin() {
+  registerPage.classList.add("hidden");
+  loginPage.classList.remove("hidden");
+}
 
-  // ── Auth Tab Switch ───────────────────────────────────────────────────────
-  function switchTab(tab) {
-    document.querySelectorAll('.tab-btn').forEach((b, i) => {
-      b.classList.toggle('active', (tab === 'login') ? i === 0 : i === 1);
-    });
-    document.getElementById('login-form').style.display    = tab === 'login'    ? 'block' : 'none';
-    document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
-  }
-
-  // ── Register ──────────────────────────────────────────────────────────────
-  async function handleRegister() {
-    const username = document.getElementById('reg-username').value.trim();
-    const email    = document.getElementById('reg-email').value.trim();
-    const password = document.getElementById('reg-password').value;
-    const errEl    = document.getElementById('reg-error');
-    const okEl     = document.getElementById('reg-success');
-
-    errEl.classList.remove('show');
-    okEl.classList.remove('show');
-
-    try {
-      const res = await fetch(`${API}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Registration failed');
-      okEl.textContent = '✓ Account created! You can now log in.';
-      okEl.classList.add('show');
-      setTimeout(() => switchTab('login'), 1200);
-    } catch (e) {
-      errEl.textContent = e.message;
-      errEl.classList.add('show');
-    }
-  }
-
-  // ── Login ─────────────────────────────────────────────────────────────────
-  async function handleLogin() {
-    const username = document.getElementById('login-username').value.trim();
-    const password = document.getElementById('login-password').value;
-    const errEl    = document.getElementById('login-error');
-    errEl.classList.remove('show');
-
-    try {
-      const res = await fetch(`${API}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Login failed');
-      token = data.access_token;
-      currentUser = username;
-      localStorage.setItem('tm_token', token);
-      localStorage.setItem('tm_user', username);
-      showApp();
-    } catch (e) {
-      errEl.textContent = e.message;
-      errEl.classList.add('show');
-    }
-  }
-
-  // ── Logout ────────────────────────────────────────────────────────────────
-  function logout() {
-    token = null;
-    currentUser = null;
-    localStorage.removeItem('tm_token');
-    localStorage.removeItem('tm_user');
-    document.getElementById('app-screen').classList.remove('visible');
-    document.getElementById('auth-screen').style.display = 'flex';
-    document.getElementById('header-user').style.display = 'none';
-  }
-
-  // ── Show App ──────────────────────────────────────────────────────────────
-  function showApp() {
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('app-screen').classList.add('visible');
-    document.getElementById('header-user').style.display = 'flex';
-    document.getElementById('username-display').textContent = currentUser;
-    loadTasks();
-    loadCounts();
-  }
-
-  // ── API helper ────────────────────────────────────────────────────────────
-  async function api(path, opts = {}) {
-    const res = await fetch(`${API}${path}`, {
-      ...opts,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(opts.headers || {}),
-      },
-    });
-    if (res.status === 401) { logout(); return null; }
-    if (res.status === 204) return null;
-    return res.json();
-  }
-
-  // ── Load Tasks ────────────────────────────────────────────────────────────
-  async function loadTasks() {
-    const list = document.getElementById('tasks-list');
-    list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;padding:20px 0"><span class="loader"></span> Loading...</div>';
-
-    const completedParam = currentFilter === 'pending'   ? '&completed=false'
-                         : currentFilter === 'completed' ? '&completed=true'
-                         : '';
-    const data = await api(`/tasks?page=${currentPage}&page_size=${PAGE_SIZE}${completedParam}`);
-    if (!data) return;
-
-    renderTasks(data);
-    loadCounts();
-  }
-
-  function renderTasks(data) {
-    const list  = document.getElementById('tasks-list');
-    const pager = document.getElementById('pagination');
-
-    if (data.tasks.length === 0) {
-      list.innerHTML = `
-        <div class="empty-state">
-          <div class="icon">□</div>
-          <p>No tasks here yet.<br/>Hit "+ New task" to add one.</p>
-        </div>`;
-      pager.style.display = 'none';
-      return;
-    }
-
-    list.innerHTML = data.tasks.map(t => `
-      <div class="task-card ${t.completed ? 'completed' : ''}" id="task-${t.id}">
-        <div class="task-check" onclick="toggleComplete(${t.id}, ${t.completed})"></div>
-        <div class="task-body">
-          <div class="task-title">${escHtml(t.title)}</div>
-          ${t.description ? `<div class="task-desc">${escHtml(t.description)}</div>` : ''}
-          <div class="task-meta">#${t.id} · ${formatDate(t.created_at)}</div>
-        </div>
-        <div class="task-actions">
-          ${!t.completed ? `<button class="btn-done" onclick="toggleComplete(${t.id}, false)">✓ done</button>` : ''}
-          <button class="btn-danger" onclick="deleteTask(${t.id})">✕</button>
-        </div>
-      </div>`).join('');
-
-    // Pagination
-    const totalPages = Math.ceil(data.total / PAGE_SIZE);
-    if (totalPages > 1) {
-      pager.style.display = 'flex';
-      document.getElementById('page-info').textContent = `page ${currentPage} / ${totalPages}`;
-      document.getElementById('btn-prev').disabled = currentPage === 1;
-      document.getElementById('btn-next').disabled = currentPage === totalPages;
-    } else {
-      pager.style.display = 'none';
-    }
-  }
-
-  // ── Counts ────────────────────────────────────────────────────────────────
-  async function loadCounts() {
-    const [all, done] = await Promise.all([
-      api('/tasks?page=1&page_size=1'),
-      api('/tasks?page=1&page_size=1&completed=true'),
-    ]);
-    if (!all || !done) return;
-    const pending = all.total - done.total;
-    document.getElementById('count-all').textContent       = all.total;
-    document.getElementById('count-pending').textContent   = pending;
-    document.getElementById('count-completed').textContent = done.total;
-  }
-
-  // ── Create Task ───────────────────────────────────────────────────────────
-  async function createTask() {
-    const title = document.getElementById('new-title').value.trim();
-    const desc  = document.getElementById('new-desc').value.trim();
-    if (!title) { toast('Title is required', 'error'); return; }
-
-    const data = await api('/tasks', {
-      method: 'POST',
-      body: JSON.stringify({ title, description: desc || null }),
-    });
-    if (!data) return;
-
-    document.getElementById('new-title').value = '';
-    document.getElementById('new-desc').value  = '';
-    toggleAddForm();
-    toast('Task created!', 'success');
-    currentPage = 1;
-    loadTasks();
-  }
-
-  // ── Toggle Complete ───────────────────────────────────────────────────────
-  async function toggleComplete(id, isCompleted) {
-    await api(`/tasks/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify({ completed: !isCompleted }),
-    });
-    loadTasks();
-  }
-
-  // ── Delete Task ───────────────────────────────────────────────────────────
-  async function deleteTask(id) {
-    await api(`/tasks/${id}`, { method: 'DELETE' });
-    toast('Task deleted', 'success');
-    loadTasks();
-  }
-
-  // ── Filter ────────────────────────────────────────────────────────────────
-  function setFilter(f) {
-    currentFilter = f;
-    currentPage   = 1;
-    ['all','pending','completed'].forEach(k => {
-      document.getElementById(`filter-${k}`).classList.toggle('active', k === f);
-    });
-    const titles = { all: 'All tasks', pending: 'Pending', completed: 'Completed' };
-    document.getElementById('panel-title').textContent = titles[f];
-    loadTasks();
-  }
-
-  // ── Pagination ────────────────────────────────────────────────────────────
-  function changePage(delta) {
-    currentPage = Math.max(1, currentPage + delta);
-    loadTasks();
-  }
-
-  // ── UI Helpers ────────────────────────────────────────────────────────────
-  function toggleAddForm() {
-    const f = document.getElementById('add-task-form');
-    f.style.display = f.style.display === 'none' ? 'flex' : 'none';
-    if (f.style.display !== 'none') document.getElementById('new-title').focus();
-  }
-
-  function escHtml(str) {
-    return String(str)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function formatDate(iso) {
-    return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-  }
-
-  let toastTimer;
-  function toast(msg, type = 'success') {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = `show ${type}`;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { el.className = ''; }, 2800);
-  }
-
-  // ── Keyboard shortcuts ────────────────────────────────────────────────────
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && document.getElementById('login-form').style.display !== 'none'
-        && document.activeElement.closest('#auth-screen')) handleLogin();
-    if (e.key === 'Enter' && document.getElementById('register-form').style.display !== 'none'
-        && document.activeElement.closest('#auth-screen')) handleRegister();
+// REGISTER
+async function register() {
+  await fetch(API + "/auth/register", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      username: ruser.value,
+      email: remail.value,
+      password: rpass.value
+    })
   });
+  alert("Registered!");
+  showLogin();
+}
+
+// LOGIN
+async function login() {
+  const res = await fetch(API + "/auth/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      username: luser.value,
+      password: lpass.value
+    })
+  });
+
+  const data = await res.json();
+  token = data.access_token;
+
+  loginPage.classList.add("hidden");
+  taskPage.classList.remove("hidden");
+
+  load();
+}
+
+// ADD TASK
+async function addTask() {
+  await fetch(API + "/tasks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({
+      title: task.value,
+      description: "test"
+    })
+  });
+
+  task.value = "";
+  load();
+}
+
+// LOAD TASKS
+async function load() {
+  const res = await fetch(API + "/tasks", {
+    headers: {"Authorization": "Bearer " + token}
+  });
+
+  const data = await res.json();
+  list.innerHTML = "";
+
+  data.items.forEach(t => {
+    list.innerHTML += `
+      <li>
+        ${t.title}
+        <button onclick="del(${t.id})">X</button>
+      </li>`;
+  });
+}
+
+// DELETE
+async function del(id) {
+  await fetch(API + "/tasks/" + id, {
+    method: "DELETE",
+    headers: {"Authorization": "Bearer " + token}
+  });
+  load();
+}
 </script>
+
 </body>
 </html>

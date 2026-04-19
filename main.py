@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.responses import FileResponse
 from database import Base, engine
 import models
 import auth
 import tasks
-# Create all tables
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -16,7 +16,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,7 +25,10 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(tasks.router)
 
+@app.get("/", include_in_schema=False)
+def serve_frontend():
+    return FileResponse("index.html")
 
-@app.get("/", tags=["Health"])
-def root():
+@app.get("/health", tags=["Health"])
+def health():
     return {"status": "ok", "message": "Task Manager API is running"}

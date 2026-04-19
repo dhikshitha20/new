@@ -2,10 +2,9 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from database import Base, get_db
 from main import app
-# Use an in-memory SQLite DB for tests
+
 TEST_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -44,8 +43,6 @@ def register_and_login(client, username="testuser", password="testpass123"):
     return resp.json()["access_token"]
 
 
-# ── Auth Tests ────────────────────────────────────────────────────────────────
-
 def test_register(client):
     resp = client.post("/auth/register", json={
         "username": "alice",
@@ -83,8 +80,6 @@ def test_login_wrong_password(client):
     resp = client.post("/auth/login", json={"username": "dave", "password": "wrong"})
     assert resp.status_code == 401
 
-
-# ── Task Tests ────────────────────────────────────────────────────────────────
 
 def test_create_task(client):
     token = register_and_login(client)
@@ -138,10 +133,8 @@ def test_filter_completed_tasks(client):
     t1 = client.post("/tasks", json={"title": "Done"}, headers=headers).json()
     client.post("/tasks", json={"title": "Pending"}, headers=headers)
     client.put(f"/tasks/{t1['id']}", json={"completed": True}, headers=headers)
-
     resp = client.get("/tasks?completed=true", headers=headers)
     assert resp.json()["total"] == 1
-
     resp2 = client.get("/tasks?completed=false", headers=headers)
     assert resp2.json()["total"] == 1
 
@@ -160,11 +153,9 @@ def test_pagination(client):
     headers = {"Authorization": f"Bearer {token}"}
     for i in range(15):
         client.post("/tasks", json={"title": f"Task {i}"}, headers=headers)
-
     resp = client.get("/tasks?page=1&page_size=10", headers=headers)
     data = resp.json()
     assert data["total"] == 15
     assert len(data["tasks"]) == 10
-
     resp2 = client.get("/tasks?page=2&page_size=10", headers=headers)
     assert len(resp2.json()["tasks"]) == 5

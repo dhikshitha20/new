@@ -1,25 +1,11 @@
 version: "3.9"
 
 services:
-  backend:
-    build: ./backend
+  api:
+    build: .
     ports:
       - "8000:8000"
-    environment:
-      - SECRET_KEY=${SECRET_KEY}
-      - DATABASE_URL=${DATABASE_URL:-sqlite:///./taskmanager.db}
-      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+    env_file:
+      - .env
     volumes:
-      - sqlite_data:/app
-    restart: unless-stopped
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-volumes:
-  sqlite_data:
+      - ./taskmanager.db:/app/taskmanager.db

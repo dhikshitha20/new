@@ -1,15 +1,14 @@
 from datetime import datetime
 from typing import List, Optional
+from pydantic import BaseModel, EmailStr
 
-from pydantic import BaseModel, EmailStr, Field
 
-
-# ── Auth Schemas ──────────────────────────────────────────────────────────────
+# ── Auth ──────────────────────────────────────────────────────────────────────
 
 class UserCreate(BaseModel):
-    username: str = Field(..., min_length=3, max_length=50)
+    username: str
     email: EmailStr
-    password: str = Field(..., min_length=6)
+    password: str
 
 
 class UserOut(BaseModel):
@@ -21,25 +20,25 @@ class UserOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-
-
 class LoginRequest(BaseModel):
     username: str
     password: str
 
 
-# ── Task Schemas ──────────────────────────────────────────────────────────────
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+# ── Tasks ─────────────────────────────────────────────────────────────────────
 
 class TaskCreate(BaseModel):
-    title: str = Field(..., min_length=1, max_length=200)
+    title: str
     description: Optional[str] = None
 
 
 class TaskUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=200)
+    title: Optional[str] = None
     description: Optional[str] = None
     completed: Optional[bool] = None
 
@@ -50,7 +49,6 @@ class TaskOut(BaseModel):
     description: Optional[str]
     completed: bool
     created_at: datetime
-    updated_at: datetime
     owner_id: int
 
     model_config = {"from_attributes": True}
